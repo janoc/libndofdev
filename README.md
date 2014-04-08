@@ -24,3 +24,7 @@ client integration. If you are looking to integrate support for these devices in
 a much better solution is to use the event interface directly. An example of how to do this can be found
 here: http://janoc.rd-h.com/files/software/linux/spacenav/spacenavig.c
 
+If you are building a virtual reality application, then the best option is to use the VRPN library: http://www.cs.unc.edu/Research/vrpn/
+VRPN supports all the devices above and many more in a transparent and abstract manner, so you don't have 
+to add support for each different interaction device or tracker specially. 
+
