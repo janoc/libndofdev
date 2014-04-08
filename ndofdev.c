@@ -34,7 +34,6 @@
     * Evdev could be used for joysticks as well, but higher level logic would have to be
     * re-implemented (calibration, filtering, etc.) - SDL includes it already.
     *
-    * Release 0.3
 */
 
 #include <linux/input.h>
