@@ -1,0 +1,17 @@
+ 2014-04-08  Jan Ciger  <jan.ciger (at) gmail.com>
+        * 0.4 
+            - added support for 3Dconnexion SpaceBall 5000 & increased number of supported buttons to 12
+ 2010-08-10  Jan Ciger  <jan.ciger (at) gmail.com>
+        * 0.3 
+            - fixed support for newer kernels - it seems that somewhere between 2.6.31 and 2.6.35 the SpaceNavigator 
+            driver was changed to send EV_ABS events instead of EV_REL. Thanks to Thomax G. thomax23 (at) googlemail.com
+              
+2008-08-25  Jan Ciger  <jan.ciger (at) gmail.com>
+	
+        * 0.2 
+            - fixed button support (Do'h!)
+            - turn the LED on when the SpaceNavigator is opened and off when it is closed
+
+2008-08-20  Jan Ciger  <jan.ciger (at) gmail.com>
+
+	* 0.1 Initial release
