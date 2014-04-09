@@ -97,6 +97,7 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
             if ((ID.vendor == 0x046d) &&
                     ((ID.product == 0xc626) || // SpaceNavigators
                      (ID.product == 0xc621) || // SpaceBall 5000 
+                     (ID.product == 0xc627) || // SpaceExplorer (untested)
                      (ID.product == 0xc623) || // SpaceTraveler (untested)
                      (ID.product == 0xc603)))  // SpaceMouse (untested)
             {
