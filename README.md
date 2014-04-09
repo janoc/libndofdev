@@ -9,6 +9,7 @@ Currently supported are the following devices (VID:PID):
   * 0x046d:0xc621   3Dconnexion SpaceBall 5000
   * 0x046d:0xc623   3Dconnexion SpaceTraveller (untested)
   * 0x046d:0xc603   3Dconnexion SpaceMouse (untested)
+  * 0x046d:0xc627   3Dconnexion SpaceExplorer (untested - from Armin Weatherwax <Armin.Weatherwax (at) gmail.com>)
 
 In addition, the library supports every joystick/gamepad device supported by the SDL library.
 
