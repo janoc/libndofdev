@@ -97,6 +97,7 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
             if ((ID.vendor == 0x046d) &&
                     ((ID.product == 0xc626) || // SpaceNavigators
                      (ID.product == 0xc621) || // SpaceBall 5000 
+                     (ID.product == 0xc62b) || // SpaceMousePro 
                      (ID.product == 0xc627) || // SpaceExplorer (untested)
                      (ID.product == 0xc623) || // SpaceTraveler (untested)
                      (ID.product == 0xc603)))  // SpaceMouse (untested)
@@ -116,7 +117,7 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
         spacenav_fd = fd;
 
         int N_AXES = 6; // FIXME: shouldn't be hardwired!
-        int N_BUTTONS = 12;
+        int N_BUTTONS = 32;
 
         in_out_dev->axes_count = N_AXES;
         in_out_dev->btn_count  = N_BUTTONS;

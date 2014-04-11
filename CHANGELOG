@@ -1,8 +1,11 @@
- 2014-04-08  Jan Ciger  <jan.ciger (at) gmail.com>
+2014-04-12  Jan Ciger  <jan.ciger (at) gmail.com>
+        * 0.5 
+            - added support for 3Dconnexion SpaceMouse Pro & increased number of supported buttons to 32 (thanks to David Seikel)
+2014-04-08  Jan Ciger  <jan.ciger (at) gmail.com>
         * 0.4 
             - added support for 3Dconnexion SpaceBall 5000 & increased number of supported buttons to 12
             - merged change from Armin Weatherwax <Armin.Weatherwax (at) gmail.com> for 3Dconnexion SpaceExplorer
- 2010-08-10  Jan Ciger  <jan.ciger (at) gmail.com>
+2010-08-10  Jan Ciger  <jan.ciger (at) gmail.com>
         * 0.3 
             - fixed support for newer kernels - it seems that somewhere between 2.6.31 and 2.6.35 the SpaceNavigator 
             driver was changed to send EV_ABS events instead of EV_REL. Thanks to Thomax G. thomax23 (at) googlemail.com
