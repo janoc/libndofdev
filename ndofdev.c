@@ -34,6 +34,7 @@
     * Evdev could be used for joysticks as well, but higher level logic would have to be
     * re-implemented (calibration, filtering, etc.) - SDL includes it already.
     *
+    * Release 0.6
 */
 
 #include <linux/input.h>
@@ -94,13 +95,32 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
         if (fd > 0)
         {
             ioctl(fd, EVIOCGID, &ID);        // get device ID
-            if ((ID.vendor == 0x046d) &&
-                    ((ID.product == 0xc626) || // SpaceNavigators
-                     (ID.product == 0xc621) || // SpaceBall 5000 
-                     (ID.product == 0xc62b) || // SpaceMousePro 
-                     (ID.product == 0xc627) || // SpaceExplorer (untested)
-                     (ID.product == 0xc623) || // SpaceTraveler (untested)
-                     (ID.product == 0xc603)))  // SpaceMouse (untested)
+            if (                            // For a nice list see http://spacemice.org/index.php?title=Dev
+                ((ID.vendor == 0x046d) && // Logitech's Vendor ID, used by 3DConnexion until they got their own.
+                    (
+                        (ID.product == 0xc603) || // SpaceMouse (untested)
+                        (ID.product == 0xc605) || // CADMan (untested)
+                        (ID.product == 0xc606) || // SpaceMouse Classic (untested)
+                        (ID.product == 0xc621) || // SpaceBall 5000
+                        (ID.product == 0xc623) || // SpaceTraveler (untested)
+                        (ID.product == 0xc625) || // SpacePilot (untested)
+                        (ID.product == 0xc626) || // SpaceNavigators
+                        (ID.product == 0xc627) || // SpaceExplorer (untested)
+                        (ID.product == 0xc628) || // SpaceNavigator for Notebooks (untested)
+                        (ID.product == 0xc629) || // SpacePilot Pro (untested)
+                        (ID.product == 0xc62b) || // SpaceMousePro
+                        0
+                    )
+                ) ||
+                ((ID.vendor == 0x256F) && // 3Dconnexion's Vendor ID
+                    (
+                        (ID.product == 0xc62E) || // SpaceMouse Wireless (cable) (untested)
+                        (ID.product == 0xc62F) || // SpaceMouse Wireless (receiver) (untested)
+                        (ID.product == 0xc631) || // Spacemouse Wireless (untested)
+                        (ID.product == 0xc632) || // SpacemousePro Wireless (untested)
+                        0
+                    )
+                ))
             {
                 // printf("Using device: %s\n", fname);
                 break;
@@ -116,10 +136,31 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
         // We have SpaceNavigator, use it
         spacenav_fd = fd;
 
-        int N_AXES = 6; // FIXME: shouldn't be hardwired!
-        int N_BUTTONS = 32;
+        unsigned int axes_count = 6; // default to sane values for these devices
+        unsigned int N_BUTTONS = 32;
 
-        in_out_dev->axes_count = N_AXES;
+        unsigned char evtype_mask[(EV_MAX + 7) / 8];
+
+        // Get the actual number of axes for this device.
+        if (ioctl(fd, EVIOCGBIT(EV_REL, sizeof evtype_mask), evtype_mask) >= 0)
+        {
+            printf("getting axis count...\n");
+            axes_count = 0;
+
+            unsigned int index = 0;
+            for (; index < REL_CNT; ++index)
+            {
+                unsigned int idx = index / 8;
+                unsigned int bit = index % 8;
+
+                axes_count += (evtype_mask[idx] & (1 << bit)) > 0;
+            }
+        } else {
+            fprintf(stderr, "%s\n", explain_ioctl(fd, EVIOCGBIT(EV_REL, sizeof evtype_mask), evtype_mask));
+        }
+
+
+        in_out_dev->axes_count = axes_count;
         in_out_dev->btn_count  = N_BUTTONS;
         in_out_dev->absolute   = 0;
         in_out_dev->valid      = 1;
@@ -130,7 +171,7 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
         // private data
         LinJoystickPrivate *priv = (LinJoystickPrivate *) malloc (sizeof(LinJoystickPrivate));
         priv->fd = fd;
-        priv->axes = (long int *) calloc(N_AXES, sizeof(long int));
+        priv->axes = (long int *) calloc(axes_count, sizeof(long int));
         priv->buttons = (long int *) calloc(N_BUTTONS, sizeof(long int));
         priv->USE_SDL = 0;
         priv->j = NULL;

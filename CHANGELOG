@@ -1,3 +1,10 @@
+2014-10-20  Jan Ciger <jan.ciger (at) gmail.com>
+        * 0.6
+            - merged patch from Ricky Curtice (http://rwcproductions.com/) 
+                - untested support for more devices
+                - dynamic determination of the number of axes 
+                - cleanups
+
 2014-04-12  Jan Ciger  <jan.ciger (at) gmail.com>
         * 0.5 
             - added support for 3Dconnexion SpaceMouse Pro & increased number of supported buttons to 32 (thanks to David Seikel)
