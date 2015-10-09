@@ -1,4 +1,4 @@
-CFLAGS=-pipe
+CFLAGS=-pipe -Wall -Wunused-result 
 
 libndofdev.a:	ndofdev.o
 		$(AR) -r $@ $< 

@@ -144,7 +144,6 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
         // Get the actual number of axes for this device.
         if (ioctl(fd, EVIOCGBIT(EV_REL, sizeof evtype_mask), evtype_mask) >= 0)
         {
-            printf("getting axis count...\n");
             axes_count = 0;
 
             unsigned int index = 0;
@@ -156,7 +155,7 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
                 axes_count += (evtype_mask[idx] & (1 << bit)) > 0;
             }
         } else {
-            fprintf(stderr, "%s\n", explain_ioctl(fd, EVIOCGBIT(EV_REL, sizeof evtype_mask), evtype_mask));
+            perror("Failed to obtain the number of axes for device:\n");
         }
 
 
@@ -183,7 +182,8 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
         led_ev.type = EV_LED;
         led_ev.code = LED_MISC;
         led_ev.value = 1;
-        write(spacenav_fd, &led_ev, sizeof(struct input_event));
+        if(write(spacenav_fd, &led_ev, sizeof(struct input_event)) < 0)
+            perror("Failed to write LED_ON command:\n");
 
         return 0;
 
@@ -226,7 +226,8 @@ void ndof_libcleanup()
         led_ev.type = EV_LED;
         led_ev.code = LED_MISC;
         led_ev.value = 0;
-        write(spacenav_fd, &led_ev, sizeof(struct input_event));
+        if(write(spacenav_fd, &led_ev, sizeof(struct input_event)) < 0)
+            perror("Failed to write LED_OFF command:\n");
     }
 
     // FIXME: needs to cleanup the memory

@@ -1,3 +1,8 @@
+2015-10-09  Jan Ciger <jan.ciger (at) gmail.com>
+        * 0.7
+            - fixed dependency on libexplain that sneaked in in the last version (thanks @techwolf)
+            - fixed two ueber-strict warnings about return values from write() (thanks @techwolf)
+
 2014-10-20  Jan Ciger <jan.ciger (at) gmail.com>
         * 0.6
             - merged patch from Ricky Curtice (http://rwcproductions.com/) 
