@@ -126,7 +126,7 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
                     )
                 ))
             {
-                // printf("Using device: %s\n", fname);
+                printf("Using device: %s\n", fname);
                 break;
             } else {
                 close(fd);
