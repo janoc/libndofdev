@@ -144,6 +144,7 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
         // Get the actual number of axes for this device.
         if (ioctl(fd, EVIOCGBIT(EV_REL, sizeof evtype_mask), evtype_mask) >= 0)
         {
+            printf("getting axis count...\n");
             axes_count = 0;
 
             unsigned int index = 0;
@@ -154,6 +155,7 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
 
                 axes_count += (evtype_mask[idx] & (1 << bit)) > 0;
             }
+            printf("...found %d axis.\n", axes_count );
         } else {
             perror("Failed to obtain the number of axes for device:\n");
         }
