@@ -141,7 +141,7 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
         spacenav_fd = fd;
 
         unsigned int axes_count = 6; // default to sane values for these devices
-        unsigned int N_BUTTONS = 32;
+        unsigned int button_count = 32;
 
         // Get the actual number of axes for this device.
         unsigned long absbit[NBITS(ABS_MAX)] = { 0 };
@@ -179,9 +179,36 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
             perror("Failed to obtain the number of axes for device:\n");
         }
 
+        // Get the actual number of buttons for this device.
+        unsigned long keybit[NBITS(KEY_MAX)] = { 0 };
+	if (ioctl(fd, EVIOCGBIT(EV_KEY, sizeof(keybit)), keybit) >= 0)
+        {
+	  button_count = 0;
+	  for (i = BTN_JOYSTICK; i < KEY_MAX; ++i) {
+            if (test_bit(i, keybit)) {
+                printf("Joystick has button: 0x%x\n", i);
+                button_count++;
+            }
+	  }
+
+	  for (i = BTN_MISC; i < BTN_JOYSTICK; ++i) {
+	      if (test_bit(i, keybit)) {
+		  printf("Joystick has button: 0x%x\n", i);
+		  button_count++;
+	      }
+	  }
+	  if (button_count != 0) {
+              printf("...found %d buttons.\n", button_count );
+	    } else {
+	      printf("None found, falling back to 32 buttons.\n");
+	      button_count = 32;
+	    }
+	} else {
+            perror("Failed to obtain the number of buttons for device:\n");
+        }
 
         in_out_dev->axes_count = axes_count;
-        in_out_dev->btn_count  = N_BUTTONS;
+        in_out_dev->btn_count  = button_count;
         in_out_dev->absolute   = 0;
         in_out_dev->valid      = 1;
         in_out_dev->axes_max   = 512;
@@ -192,7 +219,7 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
         LinJoystickPrivate *priv = (LinJoystickPrivate *) malloc (sizeof(LinJoystickPrivate));
         priv->fd = fd;
         priv->axes = (long int *) calloc(axes_count, sizeof(long int));
-        priv->buttons = (long int *) calloc(N_BUTTONS, sizeof(long int));
+        priv->buttons = (long int *) calloc(button_count, sizeof(long int));
         priv->USE_SDL = 0;
         priv->j = NULL;
         in_out_dev->private_data = priv;
