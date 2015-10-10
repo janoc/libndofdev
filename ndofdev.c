@@ -79,6 +79,10 @@ NDOF_Device *ndof_create()
     return d;
 }
 
+#define test_bit(nr, addr) \
+     (((1UL << ((nr) % (sizeof(long) * 8))) & ((addr)[(nr) / (sizeof(long) * 8)])) != 0)
+#define NBITS(x) ((((x)-1)/(sizeof(long) * 8))+1)
+
 int ndof_init_first(NDOF_Device *in_out_dev, void *param)
 {
     // try to find 3DConnexion SpaceNavigator first
@@ -139,23 +143,38 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
         unsigned int axes_count = 6; // default to sane values for these devices
         unsigned int N_BUTTONS = 32;
 
-        unsigned char evtype_mask[(EV_MAX + 7) / 8];
-
         // Get the actual number of axes for this device.
-        if (ioctl(fd, EVIOCGBIT(EV_REL, sizeof evtype_mask), evtype_mask) >= 0)
+        unsigned long absbit[NBITS(ABS_MAX)] = { 0 };
+        if (ioctl(fd, EVIOCGBIT(EV_ABS, sizeof(absbit)), absbit) >= 0)
         {
             printf("getting axis count...\n");
             axes_count = 0;
 
-            unsigned int index = 0;
-            for (; index < REL_CNT; ++index)
-            {
-                unsigned int idx = index / 8;
-                unsigned int bit = index % 8;
+            for (i = 0; i < ABS_MISC; ++i) {
+	            /* Skip hats */
+		         if (i == ABS_HAT0X) {
+		         i = ABS_HAT3Y;
+		         continue;
+		      }
+		      if (test_bit(i, absbit)) {
+		         struct input_absinfo absinfo;
 
-                axes_count += (evtype_mask[idx] & (1 << bit)) > 0;
-            }
+		         if (ioctl(fd, EVIOCGABS(i), &absinfo) < 0) {
+                  continue;
+               }
+		         printf("Joystick has absolute axis: %x\n", i);
+		         printf("Values = { %d, %d, %d, %d, %d }\n",
+			         absinfo.value, absinfo.minimum, absinfo.maximum,
+			         absinfo.fuzz, absinfo.flat);
+		         axes_count++;
+		      }
+	      }
+	      if (axes_count != 0) {
             printf("...found %d axis.\n", axes_count );
+	      } else {
+	         printf("None found, falling back to 6 axes.\n");
+	         axes_count = 6;
+	      }
         } else {
             perror("Failed to obtain the number of axes for device:\n");
         }
