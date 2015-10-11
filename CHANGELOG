@@ -1,3 +1,8 @@
+2015-10-11  Jan Ciger <jan.ciger (at) gmail.com>
+        * 0.8
+            - improved detection of number of axes & buttons (thanks @techwolf)
+            - added a simple test program to verify basic functionality
+
 2015-10-09  Jan Ciger <jan.ciger (at) gmail.com>
         * 0.7
             - fixed dependency on libexplain that sneaked in in the last version (thanks @techwolf)
@@ -23,11 +28,11 @@
             driver was changed to send EV_ABS events instead of EV_REL. Thanks to Thomax G. thomax23 (at) googlemail.com
               
 2008-08-25  Jan Ciger  <jan.ciger (at) gmail.com>
-	
+        
         * 0.2 
             - fixed button support (Do'h!)
             - turn the LED on when the SpaceNavigator is opened and off when it is closed
 
 2008-08-20  Jan Ciger  <jan.ciger (at) gmail.com>
 
-	* 0.1 Initial release
+        * 0.1 Initial release

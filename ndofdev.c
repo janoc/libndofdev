@@ -34,7 +34,7 @@
     * Evdev could be used for joysticks as well, but higher level logic would have to be
     * re-implemented (calibration, filtering, etc.) - SDL includes it already.
     *
-    * Release 0.6
+    * Release 0.8
 */
 
 #include <linux/input.h>
@@ -126,7 +126,7 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
                     )
                 ))
             {
-                printf("Using device: %s\n", fname);
+                printf("Using evdev device: %s\n", fname);
                 break;
             } else {
                 close(fd);
@@ -140,69 +140,68 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
         // We have SpaceNavigator, use it
         spacenav_fd = fd;
 
-        unsigned int axes_count = 6; // default to sane values for these devices
+        // default to sane values for these devices
+        unsigned int axes_count = 6; 
         unsigned int button_count = 32;
-
+        
         // Get the actual number of axes for this device.
+        int detected_axes_count = 0;
+
+        // first absolute axes
         unsigned long absbit[NBITS(ABS_MAX)] = { 0 };
         if (ioctl(fd, EVIOCGBIT(EV_ABS, sizeof(absbit)), absbit) >= 0)
         {
-            printf("getting axis count...\n");
-            axes_count = 0;
-
-            for (i = 0; i < ABS_MISC; ++i) {
-	            /* Skip hats */
-		         if (i == ABS_HAT0X) {
-		         i = ABS_HAT3Y;
-		         continue;
-		      }
-		      if (test_bit(i, absbit)) {
-		         struct input_absinfo absinfo;
-
-		         if (ioctl(fd, EVIOCGABS(i), &absinfo) < 0) {
-                  continue;
-               }
-		         printf("Joystick has absolute axis: %x\n", i);
-		         printf("Values = { %d, %d, %d, %d, %d }\n",
-			         absinfo.value, absinfo.minimum, absinfo.maximum,
-			         absinfo.fuzz, absinfo.flat);
-		         axes_count++;
-		      }
-	      }
-	      if (axes_count != 0) {
-            printf("...found %d axis.\n", axes_count );
-	      } else {
-	         printf("None found, falling back to 6 axes.\n");
-	         axes_count = 6;
-	      }
+            for (i = 0; i < ABS_MISC; ++i)
+            {
+                /* Skip hats */
+                if (i == ABS_HAT0X)
+                {
+                    i = ABS_HAT3Y;
+                    continue;
+                }
+                
+                if (test_bit(i, absbit))
+                    detected_axes_count++;
+            }
         } else {
-            perror("Failed to obtain the number of axes for device:\n");
+            perror("Failed to obtain the number of absolute axes for device:\n");
         }
 
+        // now relative axes
+        unsigned long relbit[NBITS(REL_MAX)] = { 0 };
+        if (ioctl(fd, EVIOCGBIT(EV_REL, sizeof(relbit)), relbit) >= 0)
+        {
+            for (i = 0; i < REL_MISC; ++i)
+            {                
+                if (test_bit(i, relbit))
+                    detected_axes_count++;
+            }
+        } else {
+            perror("Failed to obtain the number of relative axes for device:\n");
+        }
+                    
+        if (detected_axes_count != 0)
+            axes_count = detected_axes_count;
+
         // Get the actual number of buttons for this device.
+        int detected_button_count = 0;
         unsigned long keybit[NBITS(KEY_MAX)] = { 0 };
 	if (ioctl(fd, EVIOCGBIT(EV_KEY, sizeof(keybit)), keybit) >= 0)
         {
-	  button_count = 0;
-	  for (i = BTN_JOYSTICK; i < KEY_MAX; ++i) {
-            if (test_bit(i, keybit)) {
-                printf("Joystick has button: 0x%x\n", i);
-                button_count++;
+            for (i = BTN_JOYSTICK; i < KEY_MAX; ++i)
+            {
+                if (test_bit(i, keybit)) 
+                    detected_button_count++;
             }
-	  }
 
-	  for (i = BTN_MISC; i < BTN_JOYSTICK; ++i) {
-	      if (test_bit(i, keybit)) {
-		  printf("Joystick has button: 0x%x\n", i);
-		  button_count++;
-	      }
-	  }
-	  if (button_count != 0) {
-              printf("...found %d buttons.\n", button_count );
-	    } else {
-	      printf("None found, falling back to 32 buttons.\n");
-	      button_count = 32;
-	    }
+            for (i = BTN_MISC; i < BTN_JOYSTICK; ++i)
+            {
+                if (test_bit(i, keybit)) 
+                    detected_button_count++;
+            }
+            
+            if (detected_button_count != 0)
+                button_count = detected_button_count;
 	} else {
             perror("Failed to obtain the number of buttons for device:\n");
         }
