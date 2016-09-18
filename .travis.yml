@@ -1,0 +1,15 @@
+os:
+    - linux
+
+language: c
+
+compiler:
+    - clang
+    - gcc
+
+sudo: required
+dist: trusty
+
+script:
+    - sudo apt-get install libsdl-dev
+    - make
