@@ -122,6 +122,7 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
                         (ID.product == 0xc62F) || // SpaceMouse Wireless (receiver) (untested)
                         (ID.product == 0xc631) || // Spacemouse Wireless (untested)
                         (ID.product == 0xc632) || // SpacemousePro Wireless (untested)
+			(ID.product == 0xc635) || // Spacemouse Compact (untested)    
                         0
                     )
                 ))
