@@ -34,7 +34,7 @@
     * Evdev could be used for joysticks as well, but higher level logic would have to be
     * re-implemented (calibration, filtering, etc.) - SDL includes it already.
     *
-    * Release 0.8
+    * Release 0.9
 */
 
 #include <linux/input.h>
@@ -52,7 +52,7 @@
 #include "ndofdev_external.h"
 
 // Hack - we need to store the descriptor
-// of the SpaceNavigator in order to be able to 
+// of the SpaceNavigator in order to be able to
 // turn its LED off in the ndof_cleanup() function :(
 static int spacenav_fd = -1;
 
@@ -99,8 +99,8 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
         if (fd > 0)
         {
             ioctl(fd, EVIOCGID, &ID);        // get device ID
-            if (                            // For a nice list see http://spacemice.org/index.php?title=Dev
-                ((ID.vendor == 0x046d) && // Logitech's Vendor ID, used by 3DConnexion until they got their own.
+            if (                             // For a nice list see http://spacemice.org/index.php?title=Dev
+                ((ID.vendor == 0x046d) &&    // Logitech's Vendor ID, used by 3DConnexion until they got their own.
                     (
                         (ID.product == 0xc603) || // SpaceMouse (untested)
                         (ID.product == 0xc605) || // CADMan (untested)
@@ -116,13 +116,13 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
                         0
                     )
                 ) ||
-                ((ID.vendor == 0x256F) && // 3Dconnexion's Vendor ID
+                ((ID.vendor == 0x256F) &&    // 3Dconnexion's Vendor ID
                     (
                         (ID.product == 0xc62E) || // SpaceMouse Wireless (cable) (untested)
                         (ID.product == 0xc62F) || // SpaceMouse Wireless (receiver) (untested)
                         (ID.product == 0xc631) || // Spacemouse Wireless (untested)
                         (ID.product == 0xc632) || // SpacemousePro Wireless (untested)
-			(ID.product == 0xc635) || // Spacemouse Compact (untested)    
+                        (ID.product == 0xc635) || // Spacemouse Compact (untested)
                         0
                     )
                 ))
@@ -142,9 +142,9 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
         spacenav_fd = fd;
 
         // default to sane values for these devices
-        unsigned int axes_count = 6; 
+        unsigned int axes_count = 6;
         unsigned int button_count = 32;
-        
+
         // Get the actual number of axes for this device.
         int detected_axes_count = 0;
 
@@ -160,7 +160,7 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
                     i = ABS_HAT3Y;
                     continue;
                 }
-                
+
                 if (test_bit(i, absbit))
                     detected_axes_count++;
             }
@@ -173,37 +173,37 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
         if (ioctl(fd, EVIOCGBIT(EV_REL, sizeof(relbit)), relbit) >= 0)
         {
             for (i = 0; i < REL_MISC; ++i)
-            {                
+            {
                 if (test_bit(i, relbit))
                     detected_axes_count++;
             }
         } else {
             perror("Failed to obtain the number of relative axes for device:\n");
         }
-                    
+
         if (detected_axes_count != 0)
             axes_count = detected_axes_count;
 
         // Get the actual number of buttons for this device.
         int detected_button_count = 0;
         unsigned long keybit[NBITS(KEY_MAX)] = { 0 };
-	if (ioctl(fd, EVIOCGBIT(EV_KEY, sizeof(keybit)), keybit) >= 0)
+        if (ioctl(fd, EVIOCGBIT(EV_KEY, sizeof(keybit)), keybit) >= 0)
         {
             for (i = BTN_JOYSTICK; i < KEY_MAX; ++i)
             {
-                if (test_bit(i, keybit)) 
+                if (test_bit(i, keybit))
                     detected_button_count++;
             }
 
             for (i = BTN_MISC; i < BTN_JOYSTICK; ++i)
             {
-                if (test_bit(i, keybit)) 
+                if (test_bit(i, keybit))
                     detected_button_count++;
             }
-            
+
             if (detected_button_count != 0)
                 button_count = detected_button_count;
-	} else {
+        } else {
             perror("Failed to obtain the number of buttons for device:\n");
         }
 
