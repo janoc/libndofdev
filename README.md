@@ -23,6 +23,7 @@ Currently supported are the following devices (VID:PID):
   * 0x256f:0xc62f   SpaceMouse Wireless (receiver) (untested)
   * 0x256f:0xc631   SpaceMouse Wireless (untested)
   * 0x256f:0xc632   SpaceMouse Pro Wireless (untested)
+  * 0x256f:0xc635   SpaceMouse Compact (untested - from Kai Werthwein < https://github.com/KaiWerthwein >
 
 The following devices were contributed by Ricky Curtice (http://rwcproductions.com/):
 (https://bitbucket.org/lindenlab/3p-libndofdev-linux/pull-request/1/open-277-linux-support-for-spacemousepro/diff)
