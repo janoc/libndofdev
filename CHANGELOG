@@ -1,3 +1,7 @@
+2018-11-06  Jan Ciger <jan.ciger (at) gmail.com>
+        * 0.9
+            - added support for SpaceMouse Compact (thanks Kai Werthwein)
+
 2015-10-11  Jan Ciger <jan.ciger (at) gmail.com>
         * 0.8
             - improved detection of number of axes & buttons (thanks @techwolf)
@@ -10,26 +14,26 @@
 
 2014-10-20  Jan Ciger <jan.ciger (at) gmail.com>
         * 0.6
-            - merged patch from Ricky Curtice (http://rwcproductions.com/) 
+            - merged patch from Ricky Curtice (http://rwcproductions.com/)
                 - untested support for more devices
-                - dynamic determination of the number of axes 
+                - dynamic determination of the number of axes
                 - cleanups
 
 2014-04-12  Jan Ciger  <jan.ciger (at) gmail.com>
-        * 0.5 
+        * 0.5
             - added support for 3Dconnexion SpaceMouse Pro & increased number of supported buttons to 32 (thanks to David Seikel)
 2014-04-08  Jan Ciger  <jan.ciger (at) gmail.com>
-        * 0.4 
+        * 0.4
             - added support for 3Dconnexion SpaceBall 5000 & increased number of supported buttons to 12
             - merged change from Armin Weatherwax <Armin.Weatherwax (at) gmail.com> for 3Dconnexion SpaceExplorer
 2010-08-10  Jan Ciger  <jan.ciger (at) gmail.com>
-        * 0.3 
-            - fixed support for newer kernels - it seems that somewhere between 2.6.31 and 2.6.35 the SpaceNavigator 
+        * 0.3
+            - fixed support for newer kernels - it seems that somewhere between 2.6.31 and 2.6.35 the SpaceNavigator
             driver was changed to send EV_ABS events instead of EV_REL. Thanks to Thomax G. thomax23 (at) googlemail.com
-              
+
 2008-08-25  Jan Ciger  <jan.ciger (at) gmail.com>
-        
-        * 0.2 
+
+        * 0.2
             - fixed button support (Do'h!)
             - turn the LED on when the SpaceNavigator is opened and off when it is closed
 
