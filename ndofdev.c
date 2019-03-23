@@ -50,6 +50,7 @@
 #include <SDL/SDL.h>
 
 #include "ndofdev_external.h"
+#include "ndofdev_version.h"
 
 // Hack - we need to store the descriptor
 // of the SpaceNavigator in order to be able to
@@ -90,6 +91,8 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
     int fd = -1;
     char *fname = NULL;
     struct input_id ID;
+
+    printf("libndofdef version %d.%d, (c) Jan Ciger https://github.com/janoc/libndofdev\n", NDOFDEV_MAJOR, NDOFDEV_MINOR);
 
     fname = (char *)malloc(1000 * sizeof(char));
     while (i < 32)

@@ -1,3 +1,4 @@
 *.o
 *.a
+.cquery_cached_index
 ndofdev_test
