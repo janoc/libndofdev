@@ -41,6 +41,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <string.h>
 
 #include <assert.h>
 #include <stdio.h>
@@ -285,8 +286,8 @@ void ndof_libcleanup()
 }
 
 int ndof_libinit(NDOF_DeviceAddCallback in_add_cb,
-                        NDOF_DeviceRemovalCallback in_removal_cb,
-                        void *platform_specific)
+                 NDOF_DeviceRemovalCallback in_removal_cb,
+                 void *platform_specific)
 {
     // Initialize the joystick subsystem
     SDL_InitSubSystem(SDL_INIT_JOYSTICK);
@@ -347,12 +348,12 @@ void ndof_update(NDOF_Device *in_dev)
     }
 }
 
-void ndof_dump(NDOF_Device *dev)
+void ndof_dump(FILE *stream, NDOF_Device *dev)
 {
-
+    fprintf(stream, "NDOF device: %s, with %d buttons and %d axes\n", dev->product, dev->btn_count, dev->axes_count);
 }
 
-void ndof_dump_list()
+void ndof_dump_list(FILE *stream)
 {
 
 }

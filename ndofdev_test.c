@@ -38,9 +38,9 @@ int main(int argc, char** argv)
 {
     int i;
     NDOF_Device *dev = NULL;
-    
+
     ndof_libinit(NULL, NULL, NULL);
-    
+
     dev = ndof_create();
     if(ndof_init_first(dev, NULL) < 0)
     {
@@ -49,13 +49,11 @@ int main(int argc, char** argv)
     }
 
     puts("Detected:");
-    printf("\tDevice: %s\n", dev->product);
-    printf("\tNum. axes: %d\n", dev->axes_count);
-    printf("\tNum. buttons: %d\n", dev->btn_count);
+    ndof_dump(stdout, dev);
 
     puts("\nPress RETURN to start polling ...");
     getchar();
-            
+
     // try to poll the device and get data
     while(1)
     {

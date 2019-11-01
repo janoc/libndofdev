@@ -115,11 +115,11 @@ extern int ndof_init_first(NDOF_Device *in_out_dev, void *param);
  */
 extern void ndof_update(NDOF_Device *in_dev);
 
-/** Purpose:    Dumps device info on stderr. */
-extern void ndof_dump(NDOF_Device *dev);
+/** Purpose:    Dumps device info on specified FILE*. */
+extern void ndof_dump(FILE* stream, NDOF_Device *dev);
 
-/** Purpose:    Dumps list of NDOF devices currently in use on stderr. */
-extern void ndof_dump_list();
+/** Purpose:    Dumps list of NDOF devices currently in use on specified FILE*. */
+extern void ndof_dump_list(FILE* stream);
 
 #if TARGET_OS_MAC
 /** Returns the number of connected NDOF devices. Implemented only on OS X. */
