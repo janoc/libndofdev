@@ -1,5 +1,11 @@
 CFLAGS=-pipe -Wall -Wunused-result
+ifeq ($(USE_SDL2),1)
+CFLAGS := $(CFLAGS) -DUSE_SDL2
+LDFLAGS=-lSDL2
+else
 LDFLAGS=-lSDL
+endif
+
 
 all:		libndofdev.a ndofdev_test
 
