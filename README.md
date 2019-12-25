@@ -32,7 +32,9 @@ CADMan, all SpaceMice (classic & wireless) except SpaceMouse Pro (non-wireless),
 
 The devices marked as "untested" are expected to work and their VID:PIDs were sent to me by external contributors. I haven't tested them personally because I don't have that hardware, they could work, could be completely broken or anything inbetween. Caveat emptor. However, please do report any working or not working devices from the list above - that's only way to get the problems fixed.
 
-In addition, the library supports every joystick/gamepad device supported by the SDL library.
+In addition, the library supports every joystick/gamepad device
+supported by the SDL library. SDL2 is supported by passing a flag to
+the makefile: `USE_SDL2=1 make`
 
 
 C A U T I O N !!!
