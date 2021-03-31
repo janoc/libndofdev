@@ -74,6 +74,7 @@ typedef struct
     int fd;             // file descriptor of the device
     long int *axes;     // last state
     long int *buttons;
+    long int *hats;
 
     // SDL joysticks
     SDL_Joystick *j;
@@ -218,6 +219,7 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
 
         in_out_dev->axes_count = axes_count;
         in_out_dev->btn_count  = button_count;
+        in_out_dev->hats_count = 0;
         in_out_dev->absolute   = 0;
         in_out_dev->valid      = 1;
         in_out_dev->axes_max   = 512;
@@ -229,6 +231,7 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
         priv->fd = fd;
         priv->axes = (long int *) calloc(axes_count, sizeof(long int));
         priv->buttons = (long int *) calloc(button_count, sizeof(long int));
+        priv->hats = NULL;
         priv->USE_SDL = 0;
         priv->j = NULL;
         in_out_dev->private_data = priv;
@@ -251,6 +254,7 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
         {
             in_out_dev->axes_count = SDL_JoystickNumAxes(j);
             in_out_dev->btn_count = SDL_JoystickNumButtons(j);
+            in_out_dev->hats_count = SDL_JoystickNumHats(j);
             in_out_dev->absolute = 0; // always relative on Linux
             in_out_dev->valid = 1;
             in_out_dev->axes_max = 32767;
@@ -324,6 +328,12 @@ void ndof_update(NDOF_Device *in_dev)
         {
             in_dev->buttons[i] = SDL_JoystickGetButton(j, i);
         }
+
+        for(i = 0; i < in_dev->hats_count; i++)
+        {
+            in_dev->hats[i] = SDL_JoystickGetHat(j, i);
+        }
+
     } else {
         // update SpaceNavigator
 
@@ -358,7 +368,7 @@ void ndof_update(NDOF_Device *in_dev)
 
 void ndof_dump(FILE *stream, NDOF_Device *dev)
 {
-    fprintf(stream, "NDOF device: %s, with %d buttons and %d axes\n", dev->product, dev->btn_count, dev->axes_count);
+    fprintf(stream, "NDOF device: %s, with %d buttons, %d axes and %d hats\n", dev->product, dev->btn_count, dev->axes_count, dev->hats_count);
 }
 
 void ndof_dump_list(FILE *stream)
