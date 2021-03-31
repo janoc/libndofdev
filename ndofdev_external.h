@@ -36,6 +36,7 @@ extern "C" {
 
 #define NDOF_MAX_AXES_COUNT         6
 #define NDOF_MAX_BUTTONS_COUNT      32
+#define NDOF_MAX_HATS_COUNT         4
 
 typedef enum NDOF_HotPlugResult {
     NDOF_KEEP_HOTPLUGGED,
@@ -46,8 +47,10 @@ typedef enum NDOF_HotPlugResult {
 typedef struct NDOF_Device {
     long axes[NDOF_MAX_AXES_COUNT];           /* axes current values */
     long buttons[NDOF_MAX_BUTTONS_COUNT];     /* buttons current values */
+    long hats[NDOF_MAX_HATS_COUNT];
     short axes_count;		/* actual # axes (self sensed on OS X) */
     short btn_count;		/* actual # buttons (self sensed on OS X) */
+    short hats_count;       /* actual # hats */
     long axes_max;			/* logical max */
     long axes_min;			/* logical min */
 	unsigned char absolute;	/* if 0 calc delta. On OSX we always have deltas. */
