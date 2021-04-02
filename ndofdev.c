@@ -358,7 +358,6 @@ void ndof_update(NDOF_Device *in_dev)
         {
             in_dev->buttons[i] = SDL_JoystickGetButton(j, i);
         }
-
     } else {
         // update SpaceNavigator
 
