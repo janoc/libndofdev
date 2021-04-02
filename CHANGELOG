@@ -1,3 +1,7 @@
+2021-04-02  Jan Ciger <jan.ciger (at) gmail.com>
+        * 0.13
+            - Support for joystick hats as extra axes (thanks @zi-ree)
+
 2019-12-25  Jan Ciger <jan.ciger (at) gmail.com>
         * 0.12
             - Support for SDL2 (thanks @Nicky-D)
