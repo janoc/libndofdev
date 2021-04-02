@@ -78,6 +78,8 @@ typedef struct
     // SDL joysticks
     SDL_Joystick *j;
 
+    int num_hats;       // how many hats are on this joystick
+
 } LinJoystickPrivate;
 
 NDOF_Device *ndof_create()
@@ -249,7 +251,7 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
         SDL_Joystick *j = SDL_JoystickOpen(0);
         if(j)
         {
-            in_out_dev->axes_count = SDL_JoystickNumAxes(j);
+            in_out_dev->axes_count = SDL_JoystickNumAxes(j) + SDL_JoystickNumHats(j) * 2; // each hat has 2 axes
             in_out_dev->btn_count = SDL_JoystickNumButtons(j);
             in_out_dev->absolute = 0; // always relative on Linux
             in_out_dev->valid = 1;
@@ -265,6 +267,8 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
             priv->j = j;
             priv->fd = -1;
             priv->USE_SDL = 1;
+            // remember number of hats for later axis mapping in ndof_update()
+            priv->num_hats = SDL_JoystickNumHats(j);
             in_out_dev->private_data = priv;
 
             return 0;
@@ -315,9 +319,39 @@ void ndof_update(NDOF_Device *in_dev)
         SDL_JoystickUpdate();
         SDL_Joystick *j = priv->j;
 
-        for(i = 0; i < in_dev->axes_count; i++)
+        for(i = 0; i < in_dev->axes_count - priv->num_hats*2; i++) // hats will get mapped to uppermost axes
         {
             in_dev->axes[i] = (int) (SDL_JoystickGetAxis(j, i));
+        }
+
+        for(i = 0; i < priv->num_hats; i++)
+        {
+            int x = 0;
+            int y = 0;
+
+            int value = SDL_JoystickGetHat(j, i);
+
+            // map hat values (1, 2, 4, 8) to axis data (-32768, 32768)
+            if(value & 1)
+            {
+                y = -32767;
+            }
+            else if(value & 4)
+            {
+                y = 32768;
+            }
+            if(value & 2)
+            {
+                x = 32767;
+            }
+            else if(value & 8)
+            {
+                x = -32768;
+            }
+
+            // add the hat data to the uppermost axes data
+            in_dev->axes[in_dev->axes_count - priv->num_hats*2 + i*2  ] = x;
+            in_dev->axes[in_dev->axes_count - priv->num_hats*2 + i*2+1] = y;
         }
 
         for(i = 0; i < in_dev->btn_count; i++)

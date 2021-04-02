@@ -34,7 +34,7 @@
 extern "C" {
 #endif
 
-#define NDOF_MAX_AXES_COUNT         6
+#define NDOF_MAX_AXES_COUNT         8
 #define NDOF_MAX_BUTTONS_COUNT      32
 
 typedef enum NDOF_HotPlugResult {
