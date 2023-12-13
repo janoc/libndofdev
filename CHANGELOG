@@ -1,3 +1,8 @@
+2023-12-13  Jan Ciger <jan.ciger (at) gmail.com>
+        * 0.14
+            - Support for SpaceMouse Enterprise
+	    - Fixed crashes if device reports more than 32 buttons/6 axes
+
 2021-04-02  Jan Ciger <jan.ciger (at) gmail.com>
         * 0.13
             - Support for joystick hats as extra axes (thanks @zi-ree)

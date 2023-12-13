@@ -63,6 +63,12 @@
 // turn its LED off in the ndof_cleanup() function :(
 static int spacenav_fd = -1;
 
+// SpaceMouse button remapping table - SpaceMouse Enterprise has only
+// 32 buttons but reports 9bit button codes, likely for compatibility
+// with old hw.
+#define SPACE_MOUSE_BUTTON_SPACE 256
+static long SPACE_MOUSE_BUTTON_MAPPING[SPACE_MOUSE_BUTTON_SPACE];
+
 const int SPACE_NAVIG_THRESHOLD = 20; // minimum change threshold
 
 typedef struct
@@ -132,7 +138,8 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
                         (ID.product == 0xc62E) || // SpaceMouse Wireless (cable) (untested)
                         (ID.product == 0xc62F) || // SpaceMouse Wireless (receiver) (untested)
                         (ID.product == 0xc631) || // Spacemouse Wireless (untested)
-                        (ID.product == 0xc632) || // SpacemousePro Wireless (untested)
+                        (ID.product == 0xc632) || // Spacemouse Pro Wireless (untested)
+                        (ID.product == 0xc633) || // Spacemouse Enterprise
                         (ID.product == 0xc635) || // Spacemouse Compact (untested)
                         0
                     )
@@ -218,8 +225,12 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
             perror("Failed to obtain the number of buttons for device:\n");
         }
 
-        in_out_dev->axes_count = axes_count;
-        in_out_dev->btn_count  = button_count;
+        // clamp number of axes & buttons to what is actually
+        // supported by the original SDK to avoid corrupting
+        // memory. 3DConnexion devices routinely report 255+ buttons
+        // even though they have only 32.
+        in_out_dev->axes_count = (axes_count <= NDOF_MAX_AXES_COUNT) ? axes_count : NDOF_MAX_AXES_COUNT;
+        in_out_dev->btn_count  = (button_count <= NDOF_MAX_BUTTONS_COUNT) ? button_count : NDOF_MAX_BUTTONS_COUNT;
         in_out_dev->absolute   = 0;
         in_out_dev->valid      = 1;
         in_out_dev->axes_max   = 512;
@@ -301,6 +312,27 @@ int ndof_libinit(NDOF_DeviceAddCallback in_add_cb,
                  NDOF_DeviceRemovalCallback in_removal_cb,
                  void *platform_specific)
 {
+    // Fill the SpaceMouse button mapping table
+    //
+    // Remap the buttons with high number codes into the unused spaces
+    // within the first 32 buttons - likely not how the Windows driver
+    // does it but at least they will be usable. We also ignore the
+    // 9th bit.
+
+    for(long i = 0; i < SPACE_MOUSE_BUTTON_SPACE; ++i)
+        SPACE_MOUSE_BUTTON_MAPPING[i] = i;
+
+    SPACE_MOUSE_BUTTON_MAPPING[282 & 0xff] = 3;  /* Rotation lock */
+    SPACE_MOUSE_BUTTON_MAPPING[291 & 0xff] = 6;  /* Enter */
+    SPACE_MOUSE_BUTTON_MAPPING[292 & 0xff] = 7;  /* Delete */
+    SPACE_MOUSE_BUTTON_MAPPING[430 & 0xff] = 9;  /* Tab */
+    SPACE_MOUSE_BUTTON_MAPPING[431 & 0xff] = 26; /* Space */
+    SPACE_MOUSE_BUTTON_MAPPING[358 & 0xff] = 27; /* V1 */
+    SPACE_MOUSE_BUTTON_MAPPING[359 & 0xff] = 28; /* V2 */
+    SPACE_MOUSE_BUTTON_MAPPING[360 & 0xff] = 29; /* V3 */
+    SPACE_MOUSE_BUTTON_MAPPING[332 & 0xff] = 30; /* 11 */
+    SPACE_MOUSE_BUTTON_MAPPING[333 & 0xff] = 31; /* 12 */
+
     // Initialize the joystick subsystem
     SDL_InitSubSystem(SDL_INIT_JOYSTICK);
 
@@ -368,8 +400,9 @@ void ndof_update(NDOF_Device *in_dev)
             switch (ev.type)
             {
                 case EV_KEY:
-                    // printf("Key %d pressed %d.\n", ev.code, ev.value);
-                    priv->buttons[ev.code & 0xff] = ev.value;
+                    int mapped_code = SPACE_MOUSE_BUTTON_MAPPING[ev.code & 0xff];
+                    // printf("Key %d (mapped to %d) pressed %d .\n", ev.code, mapped_code, ev.value);
+                    priv->buttons[mapped_code] = ev.value;
                     break;
 
                 case EV_REL:

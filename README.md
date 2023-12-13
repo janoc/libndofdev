@@ -1,7 +1,7 @@
 libndofdev
 ==========
 
-[![Build Status](https://travis-ci.org/janoc/libndofdev.svg?branch=master)](https://travis-ci.org/janoc/libndofdev)
+[![CI](https://github.com/janoc/libndofdev/actions/workflows/CI.yml/badge.svg)](https://github.com/janoc/libndofdev/actions/workflows/CI.yml)
 
 Linux support for the 3Dconnexion SpaceBall, SpaceNavigator and joysticks in the SecondLife clients
 
@@ -23,14 +23,21 @@ Currently supported are the following devices (VID:PID):
   * 0x256f:0xc62f   SpaceMouse Wireless (receiver) (untested)
   * 0x256f:0xc631   SpaceMouse Wireless (untested)
   * 0x256f:0xc632   SpaceMouse Pro Wireless (untested)
+  * 0x256f:0xc633   SpaceMouse Enterprise (tested, works)
   * 0x256f:0xc635   SpaceMouse Compact (untested - from Kai Werthwein < https://github.com/KaiWerthwein >
 
 The following devices were contributed by Ricky Curtice (http://rwcproductions.com/):
 (https://bitbucket.org/lindenlab/3p-libndofdev-linux/pull-request/1/open-277-linux-support-for-spacemousepro/diff)
 
-CADMan, all SpaceMice (classic & wireless) except SpaceMouse Pro (non-wireless), SpaceNavigator for Notebooks
+CADMan, SpaceM (classic & wireless) except SpaceMouse Pro
+(non-wireless) and SpaceMouse Entreprise, SpaceNavigator for Notebooks
 
-The devices marked as "untested" are expected to work and their VID:PIDs were sent to me by external contributors. I haven't tested them personally because I don't have that hardware, they could work, could be completely broken or anything inbetween. Caveat emptor. However, please do report any working or not working devices from the list above - that's only way to get the problems fixed.
+The devices marked as "untested" are expected to work and their
+VID:PIDs were sent to me by external contributors. I haven't tested
+them personally because I don't have that hardware, they could work,
+could be completely broken or anything in-between. Caveat
+emptor. However, please do report any working or not working devices
+from the list above - that's the only way to get the problems fixed.
 
 In addition, the library supports every joystick/gamepad device
 supported by the SDL library. SDL2 is supported by passing a flag to
@@ -46,10 +53,15 @@ This library is a messy hack emulating the proprietary 3Dconnexion SDK, in order
 client integration. If you are looking to integrate support for these devices into a new application,
 a much better solution is to use the event interface directly. An example of how to do this can be found
 here:
-  * http://janoc.rd-h.com/files/software/linux/spacenav/spacenavig.c
+  * http://jciger.com/files/software/linux/spacenav/spacenavig.c
 
 If you are building a virtual reality application, then the best option is to use the VRPN library:
   * http://www.cs.unc.edu/Research/vrpn/
 
 VRPN supports all the devices above and many more in a transparent and abstract manner, so you don't have
-to add support for each different interaction device or tracker specially.
+to add support for each different interaction device or tracker
+specially.
+
+Another option simulating the official 3DConnexion driver is the
+Spacenav project:
+   * https://spacenav.sourceforge.net/
