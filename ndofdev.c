@@ -48,7 +48,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#ifdef USE_SDL2
+#ifdef USE_SDL3
+#include <SDL3/SDL.h>
+#elif defined USE_SDL2
 #include <SDL2/SDL.h>
 #else
 #include <SDL/SDL.h>
@@ -259,16 +261,27 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
 
     } else {
         // SpaceNavigator not found, use SDL Joystick
+#ifdef USE_SDL3
+        SDL_Joystick *j = SDL_OpenJoystick(0);
+#else
         SDL_Joystick *j = SDL_JoystickOpen(0);
+#endif
         if(j)
         {
+#ifdef USE_SDL3
+            in_out_dev->axes_count = SDL_GetNumJoystickAxes(j) + SDL_GetNumJoystickHats(j) * 2; // each hat has 2 axes
+            in_out_dev->btn_count = SDL_GetNumJoystickButtons(j);
+#else
             in_out_dev->axes_count = SDL_JoystickNumAxes(j) + SDL_JoystickNumHats(j) * 2; // each hat has 2 axes
             in_out_dev->btn_count = SDL_JoystickNumButtons(j);
+#endif
             in_out_dev->absolute = 0; // always relative on Linux
             in_out_dev->valid = 1;
             in_out_dev->axes_max = 32767;
             in_out_dev->axes_min = -32767;
-#ifdef USE_SDL2
+#ifdef USE_SDL3
+            strncpy(in_out_dev->product, SDL_GetJoystickName(j), 255);
+#elif defined USE_SDL2
             strncpy(in_out_dev->product, SDL_JoystickName(j), 255);
 #else
             strncpy(in_out_dev->product, SDL_JoystickName(0), 255);
@@ -279,7 +292,11 @@ int ndof_init_first(NDOF_Device *in_out_dev, void *param)
             priv->fd = -1;
             priv->USE_SDL = 1;
             // remember number of hats for later axis mapping in ndof_update()
+#ifdef USE_SDL3
+            priv->num_hats = SDL_GetNumJoystickHats(j);
+#else
             priv->num_hats = SDL_JoystickNumHats(j);
+#endif
             in_out_dev->private_data = priv;
 
             return 0;
@@ -348,12 +365,20 @@ void ndof_update(NDOF_Device *in_dev)
 
     if(priv->USE_SDL)
     {
+#ifdef USE_SDL3
+        SDL_UpdateJoysticks();
+#else
         SDL_JoystickUpdate();
+#endif
         SDL_Joystick *j = priv->j;
 
         for(i = 0; i < in_dev->axes_count - priv->num_hats*2; i++) // hats will get mapped to uppermost axes
         {
+#ifdef USE_SDL3
+            in_dev->axes[i] = (int) (SDL_GetJoystickAxis(j, i));
+#else
             in_dev->axes[i] = (int) (SDL_JoystickGetAxis(j, i));
+#endif
         }
 
         for(i = 0; i < priv->num_hats; i++)
@@ -361,7 +386,11 @@ void ndof_update(NDOF_Device *in_dev)
             int x = 0;
             int y = 0;
 
+#ifdef USE_SDL3
+            int value = SDL_GetJoystickHat(j, i);
+#else
             int value = SDL_JoystickGetHat(j, i);
+#endif
 
             // map hat values (1, 2, 4, 8) to axis data (-32768, 32768)
             if(value & 1)
@@ -388,7 +417,11 @@ void ndof_update(NDOF_Device *in_dev)
 
         for(i = 0; i < in_dev->btn_count; i++)
         {
+#ifdef USE_SDL3
+            in_dev->buttons[i] = SDL_GetJoystickButton(j, i);
+#else
             in_dev->buttons[i] = SDL_JoystickGetButton(j, i);
+#endif
         }
     } else {
         // update SpaceNavigator
@@ -400,10 +433,12 @@ void ndof_update(NDOF_Device *in_dev)
             switch (ev.type)
             {
                 case EV_KEY:
+			{
                     int mapped_code = SPACE_MOUSE_BUTTON_MAPPING[ev.code & 0xff];
                     // printf("Key %d (mapped to %d) pressed %d .\n", ev.code, mapped_code, ev.value);
                     priv->buttons[mapped_code] = ev.value;
                     break;
+			}
 
                 case EV_REL:
                 case EV_ABS: // 2.6.35 and up, maybe earlier kernels too send EV_ABS instead of EV_REL

@@ -1,5 +1,8 @@
 CFLAGS=-pipe -Wall -Wunused-result
-ifeq ($(USE_SDL2),1)
+ifeq ($(USE_SDL3),1)
+CFLAGS := $(CFLAGS) -DUSE_SDL3
+LDFLAGS=-lSDL3
+else ifeq ($(USE_SDL2),1)
 CFLAGS := $(CFLAGS) -DUSE_SDL2
 LDFLAGS=-lSDL2
 else
