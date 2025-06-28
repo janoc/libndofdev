@@ -1,4 +1,5 @@
 *.o
+*.so
 *.a
 .cquery_cached_index
 ndofdev_test

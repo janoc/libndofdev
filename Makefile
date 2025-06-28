@@ -1,4 +1,4 @@
-CFLAGS=-pipe -Wall -Wunused-result
+CFLAGS=-pipe -Wall -Wunused-result -fPIC
 ifeq ($(USE_SDL3),1)
 CFLAGS := $(CFLAGS) -DUSE_SDL3
 LDFLAGS=-lSDL3
@@ -10,7 +10,10 @@ LDFLAGS=-lSDL
 endif
 
 
-all:		libndofdev.a ndofdev_test
+all:		libndofdev.so libndofdev.a ndofdev_test
+
+libndofdev.so:	ndofdev.o
+		$(CC) -shared -o $@ $< $(LDFLAGS)
 
 libndofdev.a:	ndofdev.o
 		$(AR) -r $@ $<
@@ -19,4 +22,4 @@ ndofdev_test:	ndofdev_test.o libndofdev.a
 		$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 clean:
-		-rm -f *.a *.o ndofdev_test
+		-rm -f *.so *.a *.o ndofdev_test
