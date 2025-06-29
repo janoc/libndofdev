@@ -16,7 +16,7 @@ libndofdev.so:	ndofdev.o
 		$(CC) -shared -o $@ $< $(LDFLAGS)
 
 libndofdev.a:	ndofdev.o
-		$(AR) -r $@ $<
+		$(AR) -l "$(LDFLAGS)" -r $@ $<
 
 ndofdev_test:	ndofdev_test.o libndofdev.a
 		$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
